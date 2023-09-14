@@ -75,7 +75,7 @@ class ClipCaptionModel(nn.Module):
             logger.info('succeed to load pretrain gpt2 model')
         except:
             config = GPT2Config.from_pretrained(gpt2_path)
-            self.gpt2 = GPT2LMHeadModel.from_config(config)
+            self.gpt2 = GPT2LMHeadModel.from_pretrained("uer/gpt2-chinese-cluecorpussmall")
             logger.info('random initialize gpt2 model')
         # self.gpt2 = AutoModelWithLMHead.from_pretrained(gpt2_path)
         # 将每个图片向量[clip_size] -> [prefix_len, prefix_size]
