@@ -64,7 +64,7 @@ class BertMapper(nn.Module):
 
 class ClipCaptionModel(nn.Module):
 
-    def __init__(self, gpt2_path, bert_config, prefix_len=10, clip_size=512, mapping_type: MappingType = MappingType.MLP,
+    def __init__(self, gpt2_path, bert_config, prefix_len_clip=10, clip_size=512, mapping_type: MappingType = MappingType.MLP,
                  finetune_gpt2=False, constant_len=10):
         super(ClipCaptionModel, self).__init__()
 
@@ -79,15 +79,19 @@ class ClipCaptionModel(nn.Module):
             logger.info('random initialize gpt2 model')
         # self.gpt2 = AutoModelWithLMHead.from_pretrained(gpt2_path)
         # 将每个图片向量[clip_size] -> [prefix_len, prefix_size]
+
+        # prefix_len <=> clip_length(original)
+        # constant_len <=> prefix_length(original)
+        
         self.prefix_size = self.gpt2.config.n_embd
-        self.prefix_len = prefix_len
+        self.prefix_len = constant_len
         # fix mapping type bug
         mapping_type = {"mlp": MappingType.MLP, "bert": MappingType.BERT}[mapping_type]
-        
+
         if mapping_type == MappingType.MLP:
-            self.clip_project = MLP((clip_size, (self.prefix_size * prefix_len) // 2, self.prefix_size * prefix_len))
+            self.clip_project = MLP((clip_size, (self.prefix_size * self.prefix_len) // 2, self.prefix_size * self.prefix_len))
         else:
-            self.clip_project = BertMapper(bert_config, clip_size, self.prefix_size, prefix_len, constant_len)
+            self.clip_project = BertMapper(bert_config, clip_size, self.prefix_size, prefix_len_clip, constant_len)
         self.finetune_gpt2 = finetune_gpt2
 
     def forward(self, clip_embeds, caption_ids, mask):
