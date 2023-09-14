@@ -1,1 +1,9 @@
 pretrain_models/ViT-B-32.pt
+datasets/flickr30k-images/
+datasets/captions.txt
+datasets/clip_caption.pkl
+datasets/train.pkl
+output/**
+
+__pycache__/
+*/__pycache__/
