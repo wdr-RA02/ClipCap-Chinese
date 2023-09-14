@@ -81,6 +81,9 @@ class ClipCaptionModel(nn.Module):
         # 将每个图片向量[clip_size] -> [prefix_len, prefix_size]
         self.prefix_size = self.gpt2.config.n_embd
         self.prefix_len = prefix_len
+        # fix mapping type bug
+        mapping_type = {"mlp": MappingType.MLP, "bert": MappingType.BERT}[mapping_type]
+        
         if mapping_type == MappingType.MLP:
             self.clip_project = MLP((clip_size, (self.prefix_size * prefix_len) // 2, self.prefix_size * prefix_len))
         else:
