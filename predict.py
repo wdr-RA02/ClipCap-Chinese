@@ -141,9 +141,10 @@ def main(args):
     image_name_list = []
     for batch_idx, data in enumerate(tqdm(dataloader)):
         images, image_names = data
+        images = images.to(args.device)
         clip_embeds = clip_model.encode_image(images)
         clip_embeds = clip_embeds.unsqueeze(1).repeat(1, args.num_generate, 1).view(-1, clip_embeds.size(-1))
-        captions = generate(model, clip_embeds, tokenizer, args)
+        captions = generate(model, clip_embeds.to(dtype=torch.float32), tokenizer, args)
 
         # 每num_generate个caption对应一张图片
         captions = ['\t'.join(captions[i: i+args.num_generate]) for i in range(0, clip_embeds.size(0), args.num_generate)]
